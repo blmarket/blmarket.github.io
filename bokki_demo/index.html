@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html ng-app="bokki">
+  <head>
+    <meta charset="utf-8">
+    <title>Bokki DEMO</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0rc1/angular-resource.min.js"></script>
+    <script src="bokki.js"></script>
+    <link rel="stylesheet" href="http://blmarket.net/~blmarket/jsdifflib/diffview.css">
+  </head>
+  <body>
+    <div class="container">
+      <div ng-controller="BokkiCtrl" ng-init="load('blmarket', 'icpc', 'blmarket/GearsDiv1.cpp')"><span>{{owner}}/{{repo}}/{{path}} </span><span ng-if="revs">: {{rev_index}}</span>
+        <div ng-if="!revs">
+          <p>Now Loading...</p>
+        </div>
+        <div ng-if="revs &amp;&amp; rev_index == 0">
+          <p>First Revision</p>
+          <pre>{{revs[0].content}}</pre>
+        </div>
+        <div ng-if="revs &amp;&amp; rev_index == revs.length">
+          <p>Latest Revision</p>
+          <pre>{{revs[revs.length-1].content}}</pre>
+        </div>
+        <div ng-if="revs &amp;&amp; rev_index != 0 &amp;&amp; rev_index != revs.length">
+          <p>Diff View</p>
+          <div id="diff{{rev_index}}" compile="rev_index"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

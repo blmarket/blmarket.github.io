@@ -30,7 +30,7 @@ CommentsCtrl = function($scope, $resource) {
   };
   $scope.fetchComments = function() {
     Trello.get("boards/" + $scope.board_id + "/actions", {
-      limit: 25,
+      limit: 100,
       filter: 'commentCard'
     }, function(data) {
       return $scope.$apply(function() {

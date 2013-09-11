@@ -33,14 +33,14 @@ CommentsCtrl = function($scope, $resource) {
       limit: 100,
       filter: 'commentCard'
     }, function(data) {
-      return $scope.$apply(function() {
+      $scope.$apply(function() {
         return $scope.comments = data;
       });
     });
   };
   $scope.openCard = function(card_id) {
     Trello.get("cards/" + card_id, function(data) {
-      window.open(data.url);
+      window.open(data.url, 'somename');
     });
   };
 };

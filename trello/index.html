@@ -20,7 +20,7 @@
         <input type="text" ng-model="board_id"><a ng-click="fetchComments()" class="btn btn-default">Refresh</a>
         <ul>
           <li ng-repeat="cmt in comments">
-            <p>@{{cmt.memberCreator.fullName}}: {{cmt.data.text}} on <a href="#" target="somename" ng-click="openCard(cmt.data.card.id)">#{{cmt.data.card.idShort}} {{cmt.data.card.name}}</a></p>
+            <p>@{{cmt.memberCreator.fullName}}: {{cmt.data.text}} on <a href="https://trello.com/c/{{cmt.data.card.id}}">#{{cmt.data.card.idShort}}</a></p>
           </li>
         </ul>
       </div>

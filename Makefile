@@ -1,7 +1,7 @@
 all: update build install
 
 update:
-	git submodule update
+	git submodule foreach git pull origin master
 
 build:
 	sh -c 'cd 6506197 && npm install && grunt'

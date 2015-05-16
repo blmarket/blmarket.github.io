@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="/stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title> Node v0.10 streaming </title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>blmarket.github.io</h1>
+        <h2>나도 내가 뭘 하는지 모르겠다.
+</h2>
+        <a href="https://github.com/pietromenna/jekyll-architect-theme" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          
+          <h1>Node v0.10 streaming</h1>
+<p class="meta">작성일자 : 01 Jan 2014</p>
+
+<h3 id="head-first-example">Head first example</h3>
+
+<p>당신의 Express app이 제공하는 모든 경로에 대해 설명하는 문서를 작성하고 싶었다.
+그러기 위해서 먼저 그 경로들을 뽑아내는 함수를 만들려고 했다.
+처음 생각해서 만든 코드는 다음과 같다.</p>
+
+<div class="highlight"><pre><code class="language-coffee" data-lang="coffee"><span class="nv">routes = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;./routes&#39;</span><span class="p">).</span><span class="nx">routes</span>
+
+<span class="nv">fetchList = </span><span class="nf">(onItem, callback) -&gt;</span>
+  <span class="nv">fake_app = </span><span class="p">{}</span>
+  <span class="nv">attach_method = </span><span class="nf">(method_name) -&gt;</span>
+    <span class="nx">fake_app</span><span class="p">[</span><span class="nx">method_name</span><span class="p">]</span> <span class="o">=</span> <span class="nf">(url) -&gt;</span>
+      <span class="nx">onItem</span> <span class="nx">method_name</span><span class="p">,</span> <span class="nx">url</span>
+
+  <span class="nx">attach_method</span><span class="p">(</span><span class="nx">method</span><span class="p">)</span> <span class="k">for</span> <span class="nx">method</span> <span class="k">in</span> <span class="p">[</span> <span class="s">&#39;get&#39;</span><span class="p">,</span> <span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="s">&#39;put&#39;</span><span class="p">,</span> <span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="s">&#39;options&#39;</span> <span class="p">]</span>
+
+  <span class="nx">routes</span> <span class="nx">fake_app</span>
+  <span class="nx">callback</span> <span class="kc">null</span>
+
+<span class="nx">fetchList</span><span class="p">(</span>
+  <span class="nf">(method, url) -&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">method</span><span class="p">,</span> <span class="nx">url</span>
+  <span class="nf">(err) -&gt;</span>
+    <span class="k">throw</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+    <span class="nx">process</span><span class="p">.</span><span class="nx">exit</span><span class="p">()</span>
+<span class="p">)</span></code></pre></div>
+
+<p>근데 일단 콜백 함수를 두 종류로 만들어 관리해야 하는 것도 마음에 안들었고, 원래 알고 있던</p>
+
+<p>node의 stream이랑 하는 일이 너무 비슷해 보여서 이럴바에는 stream으로 구현하기로 맘먹었다.</p>
+
+<h3 id="node-stream">Node의 stream</h3>
+
+<p><a href="http://blog.nodejs.org/2012/12/20/streams2/">새 stream에 대한 설명</a>을 보면 알겠지만, .10의
+stream은 이전 버전과 달리 pause를 구현해야만 한다. 간단히 생각해서, 한강에 홍수가 날것 같으면
+팔당댐을 막아 흘려보내는 수량을 조절하듯이, node의 stream에서도, 받는 녀석이 제때제때 처리하지
+못하면 보내는 녀석을 막아 중간에 생기는 버퍼의 최대 크기를 조절해주는 것이다.</p>
+
+<p>허나 예전 버전에서는 꼭 pause 함수를 구현할 필요가 없었기 때문에(라이브러리가 그것을 강제하지
+않았다) 때로 버퍼가 넘쳐 서버에 메모리 부하를 주는 경우도 있었다. 간단히 말해, 한강이 넘쳐서
+물난리가 났다고 생각해라.</p>
+
+<h3 id="section">그런데…</h3>
+
+<p>node의 stream은 기본적으로 binary buffer이다. 즉 위 예제의 javascript object를 stream에 
+실어 보내려면 먼저 JSON등을 이용해서 serialize를 해서 보내고 받고 해야 한다는 것인데… 
+너무 비효율적이란 생각이 들었다.</p>
+
+<h3 id="section-1">혹시 대안은?</h3>
+
+<p>Stream 문서를 다시 찬찬히 읽어보다가 objectMode란 플래그를 발견했다. 혹시?
+<a href="http://blog.strongloop.com/practical-examples-of-the-new-node-js-streams-api/">설명을 발견한 문서</a>
+에 따르면 이건 그냥 stream을 임의 chunk 대신 line by line으로 처리할 수 있게 해주는 녀석이라 한다.</p>
+
+<p>사실 streaming이 javascript object를 처리해줬으면 더 좋았겠지만, 실상 이녀석은 성능이 중요한
+녀석도 아니고, 설혹 성능이 중요하다 하더라도 object를 직접 넘기는 과정에서 어차피 cloning을
+했어야 하는 것이니만큼, 그냥 JSON을 중간에 한번 거쳐도 무방하다고 생각된다.</p>
+
+<h3 id="v010-stream-head-first-example">v0.10 stream의 head first example</h3>
+
+<p>무의미한 스트링을 계속 쏟아내는 stream을 만들어봤다.</p>
+
+<div class="highlight"><pre><code class="language-coffee" data-lang="coffee"><span class="nv">stream = </span><span class="nx">require</span> <span class="s">&#39;stream&#39;</span>
+<span class="nv">routes = </span><span class="nx">require</span><span class="p">(</span><span class="s">&#39;./routes&#39;</span><span class="p">).</span><span class="nx">routes</span>
+
+<span class="k">class</span> <span class="nx">APIListReader</span> <span class="k">extends</span> <span class="nx">stream</span><span class="p">.</span><span class="nx">Readable</span>
+  <span class="nv">_read: </span><span class="nf">-&gt;</span>
+    <span class="nx">setImmediate</span> <span class="nf">=&gt;</span> <span class="c1"># 보통 stream은 async하게 작동한다.</span>
+      <span class="nv">chunk = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="nx">a</span><span class="o">:</span><span class="mi">1</span><span class="p">})</span>
+      <span class="k">while</span> <span class="nx">@push</span><span class="p">(</span><span class="nx">chunk</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="mi">1</span> <span class="c1"># keep pushing</span>
+
+<span class="nv">reader = </span><span class="k">new</span> <span class="nx">APIListReader</span> <span class="p">{</span>
+  <span class="nv">highWaterMark: </span><span class="mi">16384</span>
+<span class="p">}</span>
+<span class="nx">reader</span><span class="p">.</span><span class="nx">on</span> <span class="s">&#39;readable&#39;</span><span class="p">,</span> <span class="nf">-&gt;</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">reader</span><span class="p">.</span><span class="nx">read</span><span class="p">()</span></code></pre></div>
+
+<p>실행해보니 대충 원하는 대로 나온다. </p>
+
+<p>setImmediate를 쓰지 않으면 stream이 sync 모드로 작동하면서 call stack이 
+폭발하는 문제가 있긴 하지만 node의 문제이고 워낙 변태같은 사용 사례이니 
+패스하자.</p>
+
+<h3 id="section-2">병신같지만 작동하는 다음 버전</h3>
+
+<p>우리가 미리 만들어놓은 routes 함수는 당연빠따 streaming을 지원하지 않으므로,
+예전 버전이나 마찬가지로 구현해야 한다 <code>-_-;;</code>… 에잇 포기 streaming은
+걍 다음에 쓰도록 하자.</p>
+
+
+
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/pietromenna/jekyll-architect-theme/archive/master.zip" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/pietromenna/jekyll-architect-theme/archive/master.tar.gz" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/jasonlong/architect-theme">architect-theme</a> is maintained by <a href="https://github.com/jasonlong">jasonlong</a>.</p>
+
+          <p class="repo-owner"><a href="https://github.com/pietromenna/jekyll-architect-theme">jekyll-architect-theme</a> is maintained by <a href="https://github.com/pietromenna">pietromenna</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  </body>
+</html>

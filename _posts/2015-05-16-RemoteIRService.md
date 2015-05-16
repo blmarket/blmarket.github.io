@@ -5,6 +5,8 @@ date:   2014-05-16 23:23:23
 categories: remoteir release android
 ---
 
+[Project Homepage](https://github.com/blmarket/RemoteIRService)
+
 ### Abstract
 
 이 프로젝트는 ir blaster 기능을 제공하는 맛폰에서, ir blaster 기능을 REST API를 통해 제공하는 것을 목표로 한다.
@@ -22,9 +24,11 @@ categories: remoteir release android
 
 ### How to use?
 
+프로젝트의 홈페이지를 참조하면 간단한 사용방법에 대해 알 수 있고, 여기서는 기술적 이야기보다는 뭐가 필요한지에 대해 더 설명해보도록 하겠다.
+
 자기가 사용하는 장비의 리모트 신호에 대해 알아야 요청을 만들어 보낼 수 있다. 신호가 어떻게 생성되어 전송되는지에 대해서는 [삼성전자의 설명 문서](http://developer.samsung.com/technical-doc/view.do;jsessionid=rnY0VXbJvB8Cd141K2QXnfdDcvxJLpJ2HPvK9Qrdg004z3vj1Cnl!404960129?v=T000000125)를 참조하면 좋다. 장비의 리모트 신호를 얻는 방법은 여러가지가 있는데
 
-* 저자(twitter @blmarket)에게 직접 문의한다 - 이런저런 신호를 나에게 맞게 변환해 두었다. 용량과 혹시나 있을 수 있는 저작권 문제로 public 공개는 하지 않았지만...
+* 저자(twitter @blmarket)에게 직접 문의한다 - 이런저런 신호를 나에게 맞게 변환해 두었다. 용량과 혹시나 있을 수 있는 저작권 문제로 public 공개는 하지 못할것 같은데...
 * [다음 guide](http://stackoverflow.com/questions/20244337/consumerirmanager-api-19)를 따라한다.
 * 신호를 직접 캡쳐한다 - ir LED가 있으면 audio input을 이용해서 간단하게 오실로스코프 비스무레하게 작동하게 만들 수 있고, 그걸 활용해서 신호 table을 직접 만들 수도 있다. 여러모로 힘들고 괴로운 작업이 되겠지만... 인터넷 상에서 신호 table을 구할 수 없다면 이게 유일한 방법이겠지;;
 

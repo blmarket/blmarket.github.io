@@ -1,42 +1,13 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Blmarket.github.io by blmarket</title>
+---
+layout: default
+title: Architect Theme by Jason Long
+---
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Blmarket.github.io</h1>
-        <p>blmarket public page</p>
-
-
-        <p class="view"><a href="https://github.com/blmarket">View My GitHub Profile</a></p>
-
-      </header>
-      <section>
-        <h2>
-<a name="index" class="anchor" href="#index"><span class="octicon octicon-link"></span></a>Index</h2>
-
-<ul>
-<li><a href="./articles/Streaming.html">Node v0.10의 Streaming</a></li>
-<li><a href="./headfirstR">R 시작하기</a></li>
-<li><a href="./trello">Angular.js를 이용한 Trello 댓글 조회하기</a></li>
-</ul>
-      </section>
-      <footer>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
-</html>
+<div id="home">
+  <h1>Blog Posts</h1>
+  <ul class="posts">
+    {% for post in site.posts %}
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div>

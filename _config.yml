@@ -1,0 +1,14 @@
+# Site settings
+title: blmarket.github.io
+email: blmarket@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  나도 내가 뭘 하는지 모르겠다.
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "https://blmarket.github.io" # the base hostname & protocol for your site
+twitter_username: blmarket
+github_username:  blmarket
+
+# Build settings
+highlighter: pygments
+markdown: kramdown
+# markdown: redcarpet

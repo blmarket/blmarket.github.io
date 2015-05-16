@@ -81,6 +81,9 @@ GEM
       gemoji (~> 2.0)
       html-pipeline (~> 1.9)
       jekyll (~> 2.0)
+    jgd (1.6.2)
+      jekyll (>= 1.5.1)
+      trollop (= 2.0)
     json (1.8.2)
     kramdown (1.5.0)
     liquid (2.6.2)
@@ -115,6 +118,7 @@ GEM
       hitimes
     toml (0.1.2)
       parslet (~> 1.5.0)
+    trollop (2.0)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
     yajl-ruby (1.2.1)
@@ -123,5 +127,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  github-pages (= 35)
-  json
+  github-pages
+  jgd
